@@ -4,7 +4,6 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var fs = require("fs");
-var passport= require('passport');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -30,7 +29,7 @@ db.once('open', function(){
     console.log("Connnected to mongod server");
 });
 
-var router = require('./router/index')(app, Goout, passport);
+var router = require('./router/index')(app);
 
 var server = app.listen(3000, function(){
     console.log("Express server has started on port 3000");
