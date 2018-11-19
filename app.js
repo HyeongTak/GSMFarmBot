@@ -16,7 +16,7 @@ app.use(session({
 
 app.use(express.static('public'));
 
-mongoose.connect('mongodb://localhost/farmbot',{ useNewUrlParser: true })
+mongoose.connect('mongodb://localhost/farmbot',{ useNewUrlParser: true });
 mongoose.Promise = global.Promise; 
 
 app.set('views', __dirname + '/views');
@@ -29,7 +29,8 @@ db.once('open', function(){
     console.log("Connnected to mongod server");
 });
 
-var router = require('./router/index')(app);
+var index = require('./router/index');
+app.use('/', index);
 
 var server = app.listen(3000, function(){
     console.log("Express server has started on port 3000");
