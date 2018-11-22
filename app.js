@@ -32,6 +32,8 @@ db.once('open', function(){
 var index = require('./router/index');
 app.use('/', index);
 
+app.use('/img',express.static('img'));
+
 var server = app.listen(3000, function(){
     console.log("Express server has started on port 3000");
 });

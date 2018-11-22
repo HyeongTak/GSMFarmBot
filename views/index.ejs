@@ -1,9 +1,25 @@
 <html>
   <head>
   <title>FarmBot</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+  <style>
+  img{
+    width:32px;
+    height:32px;
+  }
+  </style>
   </head>
   <body>
     <h1>FarmBot</h1>
+    <table>
+      <tbody>
+        <% for(var i=0;i<10;i++){ %>
+          <tr>
+          <% for(var j=0;j<10;j++){ %>
+            <td>
+            <button class="btn" id="btn" type="submit" style="background-color: #a4f442;border:none;"><img class="btn-img" src="img/tomato.png"></button>
+            </td>
+          <% } %>
+          </tr>
+        <% } %>
   </body>
 </html>
