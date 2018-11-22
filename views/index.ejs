@@ -7,6 +7,26 @@
     height:32px;
   }
   </style>
+  <script>
+    var plantSrc = "";
+    var plantName = "";
+
+    function changePlant(p){
+      plantName = p;
+      if(p == "carrot"){
+        plantSrc = "img/carrot.png";
+      }
+      if(p == "cabbage"){
+        plantSrc = "img/cabbage.png";
+      }
+    }
+    function changeImg(id){
+      console.log(id);
+      var img = document.getElementById(id);
+      img.src = plant;
+    }
+    
+  </script>
   </head>
   <body>
     <h1>FarmBot</h1>
@@ -16,10 +36,14 @@
           <tr>
           <% for(var j=0;j<10;j++){ %>
             <td>
-            <button class="btn" id="btn" type="submit" style="background-color: #a4f442;border:none;"><img class="btn-img" src="img/tomato.png"></button>
+            <button class="btn" onclick="changeImg(img<%=i%><%=j%>.id)" style="background-color: #a4f442;border:none;"><img class="btn-img" id="img<%=i%><%=j%>" ></button>
             </td>
           <% } %>
           </tr>
         <% } %>
+      </tbody>
+    </table>
+    <button class="btn" onclick="changePlant('carrot')"><img class="btn-img" src="img/carrot.png"></button>
+    <button class="btn" onclick="changePlant('cabbage')"><img class="btn-img" src="img/cabbage.png"></button>
   </body>
 </html>
