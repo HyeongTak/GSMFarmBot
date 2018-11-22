@@ -28,6 +28,13 @@
       var img = document.getElementById(id);
       img.src = plantSrc;
     }
+    function settingPlant(){
+      <% for(var i=0;i<10;i++){%>
+        <% for(var j=0;j<10;j++){%>
+          <%if(plantArr[i][j]){%>changePlant("<%=plantArr[i][j]%>");changeImg("img<%=i%><%=j%>");<%}%>
+        <%}%>
+      <%}%>
+    }
 
   </script>
   </head>
@@ -39,13 +46,25 @@
           <tr>
           <% for(var j=0;j<10;j++){ %>
             <td>
-            <button class="btn" onclick="changeImg(img<%=i%><%=j%>.id)" style="background-color: #a4f442;border:none;"><img class="btn-img" id="img<%=i%><%=j%>" ></button>
+            <% if(plantArr[i][j]){%>
+              <button class="btn" style="background-color:red ;border:none;">
+                <img class="btn-img" id="img<%=i%><%=j%>">
+              </button>
+            <%}%>
+            <% if(!plantArr[i][j]){ %>
+            <button class="btn" onclick="changeImg(img<%=i%><%=j%>.id)" style="background-color: #a4f442;border:none;">
+              <img class="btn-img" id="img<%=i%><%=j%>">
+            </button>
+            <% } %>
             </td>
           <% } %>
           </tr>
         <% } %>
       </tbody>
     </table>
+    <script>
+      settingPlant();
+    </script>
     <button class="btn" onclick="changePlant('carrot')"><img class="btn-img" src="img/carrot.png"></button>
     <button class="btn" onclick="changePlant('cabbage')"><img class="btn-img" src="img/cabbage.png"></button>
     <button class="btn" onclick="changePlant('eraser')"><img class="btn-img" src="img/eraser.png"></button>
