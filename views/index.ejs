@@ -7,9 +7,23 @@
     height:32px;
   }
   </style>
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   <script>
     var plantSrc = "img/empty.png";
     var plantName = "";
+    var arr = new Array(8);
+    for(var i=0;i<8;i++){
+        arr[i] = new Array(5);
+    }
+    for(var i=0;i<8;i++){
+      for(var j=0;j<5;j++){
+        arr[i][j] = "";
+      }
+    }
+
+    function post(){
+      $.post("/addPlant", { plantArr: arr }).done( window.location.href = "/" );
+    }
 
     function changePlant(p){
       plantName = p;
@@ -24,14 +38,18 @@
       }
     }
     function changeImg(id){
-      console.log(id);
+      arr[parseInt(id[3])][parseInt(id[4])] = plantName;
+      var img = document.getElementById(id);
+      img.src = plantSrc;
+    }
+    function setImg(id){
       var img = document.getElementById(id);
       img.src = plantSrc;
     }
     function settingPlant(){
-      <% for(var i=0;i<10;i++){%>
-        <% for(var j=0;j<10;j++){%>
-          <%if(plantArr[i][j]){%>changePlant("<%=plantArr[i][j]%>");changeImg("img<%=i%><%=j%>");<%}%>
+      <% for(var i=0;i<8;i++){%>
+        <% for(var j=0;j<5;j++){%>
+          <%if(plantArr[i][j]){%>changePlant("<%=plantArr[i][j]%>");setImg("img<%=i%><%=j%>");<%}%>
         <%}%>
       <%}%>
     }
@@ -42,9 +60,9 @@
     <h1>FarmBot</h1>
     <table>
       <tbody>
-        <% for(var i=0;i<10;i++){ %>
+        <% for(var i=0;i<8;i++){ %>
           <tr>
-          <% for(var j=0;j<10;j++){ %>
+          <% for(var j=0;j<5;j++){ %>
             <td>
             <% if(plantArr[i][j]){%>
               <button class="btn" style="background-color:red ;border:none;">
@@ -68,5 +86,7 @@
     <button class="btn" onclick="changePlant('carrot')"><img class="btn-img" src="img/carrot.png"></button>
     <button class="btn" onclick="changePlant('cabbage')"><img class="btn-img" src="img/cabbage.png"></button>
     <button class="btn" onclick="changePlant('eraser')"><img class="btn-img" src="img/eraser.png"></button>
+    <br/><br/>
+    <button onclick="post()">Submit</button>
   </body>
 </html>
