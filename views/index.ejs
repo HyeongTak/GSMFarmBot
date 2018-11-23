@@ -48,9 +48,31 @@
         console.log('요청 완료')
       });
     }
-    function showInfo(id){
-      
+
+    function showInfo(plantId, imgId){
+      $.ajax({
+        type: 'GET',
+        url: '/api/findInfo',
+        data: { plantId: plantId, x:  }
+      })
+      .done(function(result){
+        if(result == "carrot"){
+          plantSrc = "img/carrot.png";
+        }
+        if(result == "cabbage"){
+          plantSrc = "img/cabbage.png";
+        }
+        var img = document.getElementById(imgId);
+        img.src = plantSrc;
+      })
+      .fail(function(xhr, status, errorThrown) {
+        console.log('오류');
+      })
+      .always(function(xhr, status) {
+        console.log('요청 완료')
+      });
     }
+    
     function addPlant(id){
       var img = document.getElementById(id);
       img.src = plantSrc;

@@ -31,7 +31,6 @@ router.post('/addMap', function(req,res){
                 console.error(err);
                 return;
             }
-            console.log("map저장");
         });
     });
     

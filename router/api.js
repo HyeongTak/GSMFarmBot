@@ -11,10 +11,16 @@ router.get('/findName', function(req, res){
     });
 });
 
-router.get('/findCycle', function(req, res){
-    console.log(plant);
+router.get('/findInfo', function(req, res){
     Plant.find({_id:req.query.plantId}, function(err, plant){
-        res.send(plant[0].cycle);
+        Map.find({ x: req.query.x, y: req.query.y }, function(err, map){
+            var arr = new Array();
+            arr.push(plant[0].name);
+            arr.push(plant[0].cycle);
+            arr.push(map[0].recentDate);
+            arr.push(map[0].plantDate);
+            res.send(arr);
+        });
     });
 });
 
