@@ -12,9 +12,7 @@
     var plantSrc = "img/empty.png";
     var plantName = "";
     var arr = new Array(8);
-    for(var i=0;i<8;i++){
-        arr[i] = new Array(5);
-    }
+    for(var i=0;i<8;i++){ arr[i] = new Array(5); }
     for(var i=0;i<8;i++){
       for(var j=0;j<5;j++){
         arr[i][j] = "";
@@ -22,7 +20,7 @@
     }
 
     function post(){
-      $.post("/addPlant", { plantArr: arr }).done( window.location.href = "/" );
+      $.post("/addMap", { plantArr: arr }).done( window.location.href = "/" );
     }
 
     function changePlant(p){
@@ -53,6 +51,15 @@
         <%}%>
       <%}%>
     }
+    function removePlant(id){
+      if(plantName == "eraser"){
+        if(confirm('이미 심어진 식물입니다. 정말 삭제하시겠습니까?')){
+          var img = document.getElementById(id);
+          img.src = plantSrc;
+        }
+      }
+      
+    }
 
   </script>
   </head>
@@ -65,12 +72,12 @@
           <% for(var j=0;j<5;j++){ %>
             <td>
             <% if(plantArr[i][j]){%>
-              <button class="btn" style="background-color:red ;border:none;">
+              <button class="btn" id ="btn<%=i%><%=j%>" onclick="removePlant(img<%=i%><%=j%>.id)" style="background-color:red ;border:none;">
                 <img class="btn-img" id="img<%=i%><%=j%>">
               </button>
             <%}%>
             <% if(!plantArr[i][j]){ %>
-            <button class="btn" onclick="changeImg(img<%=i%><%=j%>.id)" style="background-color: #a4f442;border:none;">
+            <button class="btn" id ="btn<%=i%><%=j%>" onclick="changeImg(img<%=i%><%=j%>.id)" style="background-color: #a4f442;border:none;">
               <img class="btn-img" id="img<%=i%><%=j%>">
             </button>
             <% } %>
