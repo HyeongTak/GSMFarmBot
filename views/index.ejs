@@ -8,6 +8,7 @@
   }
   </style>
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script>
     var plantSrc = "img/empty.png";
     var plantName = "";
@@ -24,6 +25,32 @@
         plantSrc = "img/empty.png";
       }
     }
+    function changePlantSet(plantId, imgId){
+      $.ajax({
+        type: 'GET',
+        url: '/api/findName',
+        data: { plantId: plantId }
+      })
+      .done(function(result){
+        if(result == "carrot"){
+          plantSrc = "img/carrot.png";
+        }
+        if(result == "cabbage"){
+          plantSrc = "img/cabbage.png";
+        }
+        var img = document.getElementById(imgId);
+        img.src = plantSrc;
+      })
+      .fail(function(xhr, status, errorThrown) {
+        console.log('오류');
+      })
+      .always(function(xhr, status) {
+        console.log('요청 완료')
+      });
+    }
+    function showInfo(id){
+      
+    }
     function addPlant(id){
       var img = document.getElementById(id);
       img.src = plantSrc;
@@ -33,14 +60,10 @@
         y : id[3]
       }).done();
     }
-    function setImg(id){
-      var img = document.getElementById(id);
-      img.src = plantSrc;
-    }
     function settingPlant(){
       <% for(var i=0;i<8;i++){%>
         <% for(var j=0;j<5;j++){%>
-          <%if(plantArr[i][j]){%>changePlant("<%=plantArr[i][j]%>");setImg("img<%=i%><%=j%>");<%}%>
+          <%if(plantArr[i][j]){%>changePlantSet("<%=plantArr[i][j]%>","img<%=i%><%=j%>");<%}%>
         <%}%>
       <%}%>
     }

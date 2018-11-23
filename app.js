@@ -32,6 +32,9 @@ db.once('open', function(){
 var index = require('./router/index');
 app.use('/', index);
 
+var api = require('./router/api');
+app.use('/api', api);
+
 app.use('/img',express.static('img'));
 
 var server = app.listen(3000, function(){
