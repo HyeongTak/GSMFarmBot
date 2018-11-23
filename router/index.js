@@ -6,42 +6,35 @@ var Map = require('../models/map');
 var Plant = require('../models/plant');
 
 router.get('/', function(req, res){
-    var arr = new Array(8);
-    for(var i=0;i<8;i++){ arr[i] = new Array(5); }
-    arr[1][2] = "carrot";
-    arr[4][3] = "cabbage";
-    res.render('index', {
-        plantArr: arr
-    });
+    Map.find(function(err, map){
+        if (err) return res.status(500).send({ error: 'database failure' });
+        var arr = new Array(8);
+        for(var i=0;i<8;i++){ arr[i] = new Array(5); }
+        for(var i=0;i<map.length;i++){
+            arr[map[i].y][map[i].x] = map[i].plantId;
+        }
+        res.render('index', {
+            plantArr: arr
+        });
+    })
 });
 
 router.post('/addMap', function(req,res){
-    var arr = new Array();
-    for(var i=0;i<8;i++){
-        for(var j=0;j<5;j++){
-            if(req.body.plantArr[i][j]){
-                var map = new Map;
-                map.x = i;
-                map.y = j;
-                map.plantId = req.body.plantArr[i][j]
-                arr.push(map);
+    Plant.find({ name: req.body.plantName }, function(err, plant){
+        if (err) return res.status(500).send({ error: 'database failure' });
+        var map = new Map;
+        map.x = req.body.x;
+        map.y = req.body.y;
+        map.plantId = plant[0]._id;
+        map.save(function (err) {
+            if (err) {
+                console.error(err);
+                return;
             }
-        }
-    }
-
-    for(var i=0; i<arr.length; i++){
-        Plant.find({ name: arr[i].plantId }, function(err, plant){
-            if (err) return res.status(500).send({ error: 'database failure' });
-            arr[i].plantId = plant[0]._id;
-            arr[i].save(function (err) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                console.log("map저장");
-            });
+            console.log("map저장");
         });
-    }
+    });
+    
 });
 
 router.post('/setting', function(req, res){
