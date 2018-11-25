@@ -16,7 +16,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script>
     var plantSrc = "img/empty.png";
-    var plantName = "";
+    var plantName = "show";
     
     function changePlant(p){
       plantName = p;
@@ -29,6 +29,12 @@
       if(p == "eraser"){
         plantSrc = "img/empty.png";
       }
+      if(p == "show"){
+        document.getElementById('plantBtn').style.display="none";
+      }
+    }
+    function showBtn(){
+      document.getElementById('plantBtn').style.display="block";
     }
     function changePlantSet(plantId, imgId){
       $.ajax({
@@ -55,32 +61,46 @@
     }
 
     function showInfo(plantId, imgId){
-      $.ajax({
+      if(plantId){
+        $.ajax({
         type: 'GET',
         url: '/api/findInfo',
         data: { plantId: plantId, x: imgId[4], y:imgId[3] }
-      })
-      .done(function(result){
-        
-        var img = document.getElementById(imgId);
-        img.src = plantSrc;
-      })
-      .fail(function(xhr, status, errorThrown) {
-        console.log('오류');
-      })
-      .always(function(xhr, status) {
-        console.log('요청 완료')
-      });
+        })
+        .done(function(result){
+          document.getElementById('pName').innerHTML = '식물 이름: '+result[0];
+          document.getElementById('pCycle').innerHTML = '물 주는 주기: '+result[1];
+          document.getElementById('pDate').innerHTML = '심은 날짜: '+result[2];
+          document.getElementById('pRDate').innerHTML = '최근 물준 시간: '+result[3];
+          //var img = document.getElementById(imgId);
+          //img.src = plantSrc;
+        })
+        .fail(function(xhr, status, errorThrown) {
+          console.log('오류');
+        })
+        .always(function(xhr, status) {
+          console.log('요청 완료')
+        });
+      }else{
+        document.getElementById('pName').innerHTML = '정보 없음';
+        document.getElementById('pCycle').innerHTML = '';
+        document.getElementById('pDate').innerHTML = '';
+        document.getElementById('pRDate').innerHTML = '';
+      }
     }
     
-    function addPlant(id){
-      var img = document.getElementById(id);
-      img.src = plantSrc;
-      $.post("/addMap", { 
-        plantName: plantName,
-        x : id[4],
-        y : id[3]
-      }).done();
+    function addPlant(plantId, imgId){
+      if(plantName == "show"){
+        showInfo(plantId, imgId);
+      }else if(!plantName == "eraser"){
+        var img = document.getElementById(imgId);
+        img.src = plantSrc;
+        $.post("/addMap", { 
+          plantName: plantName,
+          x : imgId[4],
+          y : imgId[3]
+        }).done();
+      }
     }
     function settingPlant(){
       <% for(var i=0;i<8;i++){%>
@@ -89,10 +109,17 @@
         <%}%>
       <%}%>
     }
-    function removePlant(id){
+    function removePlant(plantId,imgId){
+      if(plantName == "show"){
+        showInfo(plantId, imgId);
+      }
       if(plantName == "eraser"){
         if(confirm('이미 심어진 식물입니다. 정말 삭제하시겠습니까?')){
-          var img = document.getElementById(id);
+          $.post("/delete", {
+            x : imgId[4],
+            y : imgId[3]
+          }).done();
+          var img = document.getElementById(imgId);
           img.src = plantSrc;
         }
       }
@@ -117,10 +144,10 @@
               <div class="headline">Auto <span style="font-weight:bold">Farmer</span></div>
               <v-flex xs12 text-xs-center>
                   <div>
-                    <v-btn flat >현재 농장 상태</v-btn>
+                    <v-btn flat onclick="changePlant('show')">현재 농장 상태</v-btn>
                   </div>
                   <div>
-                    <v-btn flat color="primary">식물 심기</v-btn>
+                    <v-btn flat onclick="showBtn()" color="primary">식물 심기</v-btn>
                   </div>
                   <div>
                     <v-btn flat color="error">ㅁㄴㅇㄹ</v-btn>
@@ -145,12 +172,12 @@
           <% for(var j=0;j<5;j++){ %>
             <td>
             <% if(plantArr[i][j]){%>
-              <button class="btn" id="btn<%=i%><%=j%>" onclick="removePlant(img<%=i%><%=j%>.id)" style="background-color:red; border:none;">
+              <button class="btn" id="btn<%=i%><%=j%>" onclick="removePlant('<%=plantArr[i][j]%>',img<%=i%><%=j%>.id)" style="background-color:#298A08; border:none;">
                 <img class="btn-img" id="img<%=i%><%=j%>">
               </button>
             <%}%>
             <% if(!plantArr[i][j]){ %>
-            <button class="btn" id="btn<%=i%><%=j%>" onclick="addPlant(img<%=i%><%=j%>.id)" style="background-color:transparent; border:none;">
+            <button class="btn" id="btn<%=i%><%=j%>" onclick="addPlant('<%=plantArr[i][j]%>',img<%=i%><%=j%>.id)" style="background-color:#04B404; border:none;">
               <img class="btn-img" id="img<%=i%><%=j%>">
             </button>
             <% } %>
@@ -162,15 +189,21 @@
     </table>
                       </v-flex>
                       <v-flex xs2 >
-                      <div>
-                    <button class="btn" onclick="changePlant('carrot')"><img class="btn-img" src="img/carrot.png"></button>
-                </div>
-                <div>
-                    <button class="btn" onclick="changePlant('cabbage')"><img class="btn-img" src="img/cabbage.png"></button>
-                </div>
-                <div>
-                    <button class="btn" onclick="changePlant('eraser')"><img class="btn-img" src="img/eraser.png"></button>
-                </div>
+                          <div id="plantBtn" style="display:none">
+                            <div>
+                                <button class="btn" onclick="changePlant('carrot')"><img class="btn-img" src="img/carrot.png"></button>
+                            </div>
+                            <div>
+                                <button class="btn" onclick="changePlant('cabbage')"><img class="btn-img" src="img/cabbage.png"></button>
+                            </div>
+                            <div>
+                                <button class="btn" onclick="changePlant('eraser')"><img class="btn-img" src="img/eraser.png"></button>
+                            </div>
+                          </div>
+                          <h2 id="pName" style="color:black;">식물 이름</h2>
+                          <h2 id="pCycle" style="color:black;">물 주는 주기</h2>
+                          <h2 id="pDate" style="color:black;">심어진 날짜</h2>
+                          <h2 id="pRDate" style="color:black;">최근 물준 시간</h2>
                       </v-flex>
                     </v-layout>
                   </v-container>

@@ -33,7 +33,13 @@ router.post('/addMap', function(req,res){
             }
         });
     });
-    
+});
+
+router.post('/delete', function(req,res){
+    Map.remove({ x: req.body.x, y:req.body.y }, function(err, plant){
+        if (err) return res.status(500).send({ error: 'database failure' });
+        console.log('삭제');
+    });    
 });
 
 router.post('/setting', function(req, res){
