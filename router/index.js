@@ -37,6 +37,7 @@ router.post('/addMap', function(req,res){
 });
 
 router.post('/water', function(req, res){
+    console.log('물');
     water = new Water();
     water.x = req.body.x;
     water.y = req.body.y;
