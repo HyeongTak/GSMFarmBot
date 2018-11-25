@@ -4,6 +4,7 @@ var router = express.Router();
 
 var Map = require('../models/map');
 var Plant = require('../models/plant');
+var Water = require('../models/water');
 
 router.get('/', function(req, res){
     Map.find(function(err, map){
@@ -35,6 +36,32 @@ router.post('/addMap', function(req,res){
     });
 });
 
+router.post('/water', function(req, res){
+    water = new Water();
+    water.x = req.body.x;
+    water.y = req.body.y;
+    water.save(function (err) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+    });
+});
+
+router.post('/updateMap', function(req, res){
+    Map.find({ x: req.body.x, y:req.body.y }, function(err, plant){
+        if (err) return res.status(500).send({ error: 'database failure' });
+        plant[0].recentDate = Date.now();
+        plant[0].save(function (err) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log("map업데이트");
+        });
+    });
+});
+
 router.post('/delete', function(req,res){
     Map.remove({ x: req.body.x, y:req.body.y }, function(err, plant){
         if (err) return res.status(500).send({ error: 'database failure' });
@@ -52,7 +79,7 @@ router.post('/setting', function(req, res){
             console.error(err);
             return;
         }
-        console.log("저장1");;
+        console.log("저장1");
     });
 
     var plant2 = new Plant();
@@ -64,7 +91,7 @@ router.post('/setting', function(req, res){
             console.error(err);
             return;
         }
-        console.log("저장2");;
+        console.log("저장2");
     });
 });
 

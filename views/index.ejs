@@ -60,6 +60,23 @@
       });
     }
 
+    function watering(plantId, imgId){
+      if(plantId){
+        $.post("/water", {
+        x : imgId[4],
+        y : imgId[3]
+        }).done();
+
+        $.post("/updateMap", {
+        x : imgId[4],
+        y : imgId[3]
+        }).done();
+
+      }else{
+        alert('심겨진 식물이 없습니다.');
+      }
+    }
+
     function showInfo(plantId, imgId){
       if(plantId){
         $.ajax({
@@ -92,7 +109,10 @@
     function addPlant(plantId, imgId){
       if(plantName == "show"){
         showInfo(plantId, imgId);
-      }else if(!plantName == "eraser"){
+      }else if(plantName == "water"){
+        watering(plantId, imgId);
+      }else if(!(plantName == "eraser")){
+        console.log('실행');
         var img = document.getElementById(imgId);
         img.src = plantSrc;
         $.post("/addMap", { 
@@ -112,8 +132,9 @@
     function removePlant(plantId,imgId){
       if(plantName == "show"){
         showInfo(plantId, imgId);
-      }
-      if(plantName == "eraser"){
+      }else if(plantName == "water"){
+        watering(plantId, imgId);
+      }else if(plantName == "eraser"){
         if(confirm('이미 심어진 식물입니다. 정말 삭제하시겠습니까?')){
           $.post("/delete", {
             x : imgId[4],
@@ -198,6 +219,9 @@
                             </div>
                             <div>
                                 <button class="btn" onclick="changePlant('eraser')"><img class="btn-img" src="img/eraser.png"></button>
+                            </div>
+                            <div>
+                                <button class="btn" onclick="changePlant('water')"><img class="btn-img" src="img/watering.png"></button>
                             </div>
                           </div>
                           <h2 id="pName" style="color:black;">식물 이름</h2>
