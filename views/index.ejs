@@ -32,7 +32,7 @@
 
             function setOTime(){
                 <%for(var i=0;i<5;i++){%>
-                    document.getElementById("OTime<%=i%>").innerHTML = formatLog(new Date("<%=Log[Log.length-1].time%>"), new Date());
+                    document.getElementById("OTime<%=i%>").innerHTML = formatLog(new Date("<%=Log[Log.length-i-1].time%>"), new Date());
                 <%}%>
             }
     
