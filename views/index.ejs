@@ -1,277 +1,293 @@
 <html>
     <head>
-  <title>FarmBot</title>
-  <style>
-  img{
-    width:72px;
-    height:72px;
-  }
-  </style>
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-  <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script>
-    var plantSrc = "img/empty.png";
-    var plantName = "show";
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+        <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+        <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+            var plantSrc = "img/empty.png";
+            var plantName = "show";
     
-    function formatDate(date){
-      var y = date.getFullYear();
-      var m = date.getMonth();
-      var d = date.getDate();
-      var h = date.getHours();
-      var min = date.getMinutes();
-      var s = date.getSeconds();
-      return y+'-'+m+'-'+d+' '+h+'시'+min+'분'+s+'초';
-    }
+            function formatDate(date){
+                var y = date.getFullYear();
+                var m = date.getMonth();
+                var d = date.getDate();
+                var h = date.getHours();
+                var min = date.getMinutes();
+                var s = date.getSeconds();
+                return y+'-'+m+'-'+d+' '+h+'시'+min+'분'+s+'초';
+            }
 
-    function changePlant(p){
-      plantName = p;
-      if(p == "carrot"){
-        plantSrc = "img/carrot.png";
-      }
-      if(p == "cabbage"){
-        plantSrc = "img/cabbage.png";
-      }
-      if(p == "eraser"){
-        plantSrc = "img/empty.png";
-      }
-      if(p == "show"){
-        document.getElementById('plantBtn').style.display="none";
-      }
-    }
-    function showBtn(){
-      document.getElementById('plantBtn').style.display="block";
-    }
-    function changePlantSet(plantId, imgId){
-      $.ajax({
-        type: 'GET',
-        url: '/api/findName',
-        data: { plantId: plantId }
-      })
-      .done(function(result){
-        if(result == "carrot"){
-          plantSrc = "img/carrot.png";
-        }
-        if(result == "cabbage"){
-          plantSrc = "img/cabbage.png";
-        }
-        var img = document.getElementById(imgId);
-        img.src = plantSrc;
-      })
-      .fail(function(xhr, status, errorThrown) {
-        console.log('오류');
-      })
-      .always(function(xhr, status) {
-      });
-    }
+            function formatTime(min){
+              var t = min/60;
+              var m = min%60;
+              if(m == 0){
+                return t.toString()+'시간';
+              }else{
+                return t.toString()+'시간 '+ m.toString()+'분';
+              }
+            }
 
-    function watering(plantId, imgId){
-      if(plantId){
-        $.post("/water", {
-        x : imgId[4],
-        y : imgId[3]
-        }).done();
+            function changePlant(p){
+            plantName = p;
+            if(p == "carrot"){
+                plantSrc = "img/carrot.png";
+            }
+            if(p == "cabbage"){
+                plantSrc = "img/cabbage.png";
+            }
+            if(p == "eraser"){
+                plantSrc = "img/empty.png";
+            }
+            if(p == "show"){
+                document.getElementById('plantBtn').style.display="none";
+            }
+            }
+            function showBtn(){
+            document.getElementById('plantBtn').style.display="block";
+            }
+            function changePlantSet(plantId, imgId){
+            $.ajax({
+                type: 'GET',
+                url: '/api/findName',
+                data: { plantId: plantId }
+            })
+            .done(function(result){
+                if(result == "carrot"){
+                plantSrc = "img/carrot.png";
+                }
+                if(result == "cabbage"){
+                plantSrc = "img/cabbage.png";
+                }
+                var img = document.getElementById(imgId);
+                img.src = plantSrc;
+            })
+            .fail(function(xhr, status, errorThrown) {
+                console.log('오류');
+            })
+            .always(function(xhr, status) {
+                console.log('요청 완료')
+            });
+            }
 
-        $.post("/updateMap", {
-        x : imgId[4],
-        y : imgId[3]
-        }).done();
+            function watering(plantId, imgId){
+            if(plantId){
+                $.post("/water", {
+                x : imgId[4],
+                y : imgId[3]
+                }).done();
 
-      }else{
-        alert('심겨진 식물이 없습니다.');
-      }
-    }
+                $.post("/updateMap", {
+                x : imgId[4],
+                y : imgId[3]
+                }).done();
 
-    function showInfo(plantId, imgId){
-      if(plantId){
-        $.ajax({
-        type: 'GET',
-        url: '/api/findInfo',
-        data: { plantId: plantId, x: imgId[4], y:imgId[3] }
-        })
-        .done(function(result){
-          document.getElementById('pName').innerHTML = '식물 이름: '+result[0];
-          document.getElementById('pCycle').innerHTML = '물 주는 주기: '+result[1];
-          document.getElementById('pDate').innerHTML = '심은 날짜: '+formatDate(new Date(result[2]));
-          document.getElementById('pRDate').innerHTML = '최근 물준 시간: '+formatDate(new Date(result[3]));
-          //var img = document.getElementById(imgId);
-          //img.src = plantSrc;
-        })
-        .fail(function(xhr, status, errorThrown) {
-          console.log('오류');
-        })
-        .always(function(xhr, status) {
-          console.log('요청 완료')
-        });
-      }else{
-        document.getElementById('pName').innerHTML = '정보 없음';
-        document.getElementById('pCycle').innerHTML = '';
-        document.getElementById('pDate').innerHTML = '';
-        document.getElementById('pRDate').innerHTML = '';
-      }
-    }
-    
-    function addPlant(plantId, imgId){
-      if(plantName == "show"){
-        showInfo(plantId, imgId);
-      }else if(plantName == "water"){
-        watering(plantId, imgId);
-      }else if(!(plantName == "eraser")){
-        console.log('실행');
-        var img = document.getElementById(imgId);
-        img.src = plantSrc;
-        $.post("/addMap", { 
-          plantName: plantName,
-          x : imgId[4],
-          y : imgId[3]
-        }).done();
-      }
-    }
-    function settingPlant(){
-      <% for(var i=0;i<8;i++){%>
-        <% for(var j=0;j<5;j++){%>
-          <%if(plantArr[i][j]){%>changePlantSet("<%=plantArr[i][j]%>","img<%=i%><%=j%>");<%}%>
-        <%}%>
-      <%}%>
-    }
-    function removePlant(plantId,imgId){
-      if(plantName == "show"){
-        showInfo(plantId, imgId);
-      }else if(plantName == "water"){
-        watering(plantId, imgId);
-      }else if(plantName == "eraser"){
-        if(confirm('이미 심어진 식물입니다. 정말 삭제하시겠습니까?')){
-          $.post("/delete", {
-            x : imgId[4],
-            y : imgId[3]
-          }).done();
-          var img = document.getElementById(imgId);
-          img.src = plantSrc;
-        }
-      }
-    }
+            }else{
+                alert('심겨진 식물이 없습니다.');
+            }
+            }
 
-  </script>
-  </head>
-<body>
- <div id="app">
-  <v-app light>
-    <v-content>
-      <v-container fill-height>
-        <v-layout row wrap align-center>
-          <v-flex xs12 md2>
-            <div class="text-xs-center">
-              <v-avatar size="125px">
-                <img
-                  class="img-circle elevation-7 mb-1"
-                  src="https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/lists/1.jpg"
-                >
-              </v-avatar>
-              <div class="headline">Auto <span style="font-weight:bold">Farmer</span></div>
-              <v-flex xs12 text-xs-center>
-                  <div>
-                    <v-btn flat onclick="changePlant('show')">현재 농장 상태</v-btn>
-                  </div>
-                  <div>
-                    <v-btn flat onclick="showBtn()" color="primary">식물 심기</v-btn>
-                  </div>
-                  <div>
-                    <v-btn flat color="error">ㅁㄴㅇㄹ</v-btn>
-                  </div>
-                </v-flex>
-            </div>
-          </v-flex>
-          <v-flex xs12 md8 offset-md1>
-            <div v-for="post in posts" :key="post.title">
-              <v-card class="my-3" hover height="700px">
-                <v-card-title
-                  class="white--text"
-                  height="580px"
-                >
-                  <v-container fill-height fluid>
-                    <v-layout>
-                    <v-flex xs12>
-                    <table style="background-color:#402905;">
-      <tbody>
-        <% for(var i=0;i<8;i++){ %>
-          <tr>
-          <% for(var j=0;j<5;j++){ %>
-            <td>
-            <% if(plantArr[i][j]){%>
-              <button class="btn" id="btn<%=i%><%=j%>" onclick="removePlant('<%=plantArr[i][j]%>',img<%=i%><%=j%>.id)" style="background-color:#298A08; border:none;">
-                <img class="btn-img" id="img<%=i%><%=j%>">
-              </button>
+            function showInfo(plantId, imgId){
+            if(plantId){
+                $.ajax({
+                type: 'GET',
+                url: '/api/findInfo',
+                data: { plantId: plantId, x: imgId[4], y:imgId[3] }
+                })
+                .done(function(result){
+                document.getElementById('pName').innerHTML = '식물 이름: '+result[0];
+                document.getElementById('pCycle').innerHTML = '물 주는 주기: '+formatTime(result[1]);
+                document.getElementById('pDate').innerHTML = '심은 날짜: '+formatDate(new Date(result[2]));
+                document.getElementById('pRDate').innerHTML = '최근 물준 시간: '+formatDate(new Date(result[3]));
+                //var img = document.getElementById(imgId);
+                //img.src = plantSrc;
+                })
+                .fail(function(xhr, status, errorThrown) {
+                console.log('오류');
+                })
+                .always(function(xhr, status) {
+                console.log('요청 완료')
+                });
+            }else{
+                document.getElementById('pName').innerHTML = '정보 없음';
+                document.getElementById('pCycle').innerHTML = '';
+                document.getElementById('pDate').innerHTML = '';
+                document.getElementById('pRDate').innerHTML = '';
+            }
+            }
+            
+            function addPlant(plantId, imgId){
+            if(plantName == "show"){
+                showInfo(plantId, imgId);
+            }else if(plantName == "water"){
+                watering(plantId, imgId);
+            }else if(!(plantName == "eraser")){
+                console.log('실행');
+                var img = document.getElementById(imgId);
+                if(img.src == "img/empty.png"){
+                  img.src = plantSrc;
+                  $.post("/addMap", { 
+                  plantName: plantName,
+                  x : imgId[4],
+                  y : imgId[3]
+                  }).done();
+                }
+            }
+            }
+            function settingPlant(){
+            <% for(var i=0;i<8;i++){%>
+                <% for(var j=0;j<5;j++){%>
+                <%if(plantArr[i][j]){%>changePlantSet("<%=plantArr[i][j]%>","img<%=i%><%=j%>");<%}%>
+                <%}%>
             <%}%>
-            <% if(!plantArr[i][j]){ %>
-            <button class="btn" id="btn<%=i%><%=j%>" onclick="addPlant('<%=plantArr[i][j]%>',img<%=i%><%=j%>.id)" style="background-color:#04B404; border:none;">
-              <img class="btn-img" id="img<%=i%><%=j%>" src="img/empty.png">
-            </button>
-            <% } %>
-            </td>
-          <% } %>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-                      </v-flex>
-                      <v-flex xs2 >
-                          <div id="plantBtn" style="display:none">
-                            <div>
-                                <button class="btn" onclick="changePlant('carrot')"><img class="btn-img" src="img/carrot.png"></button>
-                            </div>
-                            <div>
-                                <button class="btn" onclick="changePlant('cabbage')"><img class="btn-img" src="img/cabbage.png"></button>
-                            </div>
-                            <div>
-                                <button class="btn" onclick="changePlant('eraser')"><img class="btn-img" src="img/eraser.png"></button>
-                            </div>
-                            <div>
-                                <button class="btn" onclick="changePlant('water')"><img class="btn-img" src="img/watering.png"></button>
-                            </div>
-                          </div>
-                          <h2 id="pName" style="color:black;">식물 이름</h2>
-                          <h2 id="pCycle" style="color:black;">물 주는 주기</h2>
-                          <h2 id="pDate" style="color:black;">심어진 날짜</h2>
-                          <h2 id="pRDate" style="color:black;">최근 물준 시간</h2>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-card-title>
-              </v-card>
-            </div>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-content>
-  </v-app>
- </div>
- <script src="https://unpkg.com/vue/dist/vue.js"></script>
- <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
- <script src="https://use.fontawesome.com/73c8e2621d.js"></script>
- <script>
-   new Vue({
-    el: '#app',
-    data () {
-      return {
-        title: 'Your Logo',
-        posts: [
-          {
-            title: '',
-            content: '현재 농장 상태',
-            imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg'
-          },
-          
-        ]
-      }
-    }
-  })
- </script>
- <script>
-      settingPlant();
-    </script>
-</body>
+            }
+            function removePlant(plantId,imgId){
+            if(plantName == "show"){
+                showInfo(plantId, imgId);
+            }else if(plantName == "water"){
+                watering(plantId, imgId);
+            }else if(plantName == "eraser"){
+                if(confirm('이미 심어진 식물입니다. 정말 삭제하시겠습니까?')){
+                $.post("/delete", {
+                    x : imgId[4],
+                    y : imgId[3]
+                }).done();
+                var img = document.getElementById(imgId);
+                img.src = plantSrc;
+                }
+            }
+            }
+        </script>
+        <style>
+            img{
+            width:50px;
+            height:50px;
+            background-color:transparent;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <v-app id="inspire">
+                <v-toolbar color="white" dark>
+                    <v-toolbar-title>Auto Farmer</v-toolbar-title>
+                </v-toolbar>
+                <v-content>
+                    <v-container fluid grid-list-xl >
+                        <v-layout align-center justify-center row>
+                           <v-flex xs4>
+                               <v-card light max-height="300px">
+                                   <v-card-title>
+                                      <div>
+                                          <h4 class="font-weight-medium">최근 기록</h2>
+                                      </div> 
+                                   </v-card-title>
+                                   <v-divider light></v-divider>
+                                   <v-card-text class="py-0">
+                                        <v-timeline style="height:240px;" dense align-top>
+                                            <v-timeline-item
+                                                color="teal lighten-3"
+                                                small> 
+                                                <v-layout pt-3>
+                                                    <v-flex xs2>
+                                                        <strong>방금</strong>
+                                                    </v-flex>
+                                                    <v-flex>
+                                                        <strong>물 주기(3,5)</strong>
+                                                    </v-flex>
+                                                </v-layout>
+                                            </v-timeline-item>
+                                        </v-timeline>
+                                    </v-card-text>
+                               </v-card>
+                           </v-flex> 
+                           <v-flex xs5>
+                                <v-card light height="300px">
+                                    <v-card-title>
+                                       <div>
+                                           <h3 class="font-weight-medium">기기 정보</h2>
+                                       </div> 
+                                    </v-card-title>
+                                    <v-divider light>
+                                    </v-divider>
+                                    <v-card-text>
+                                    <h2>습도 : <%=Measure.humidity%></h2>
+                                    <h2>온도 : <%=Measure.temperature%></h2>
+                                    <br><br><br><br><br><br>
+                                    <h4 id="curTime" style="text-align:right;"></h2>
+                                    </v-card-text>
+                                </v-card>
+                            </v-flex> 
+                        </v-layout>
+                        <v-layout align-center justify-center row>
+                            <v-flex xs9>    
+                                <v-card light height="500px">
+                                    <v-card-title>
+                                        <div>
+                                            <h3 class="font-weight-medium">식물 정보</h2>
+                                        </div>
+                                        <v-spacer></v-spacer>
+                                        <div>
+                                        </div>
+                                    </v-card-title>
+                                    <v-divider light></v-divider>
+                                    <v-card-text>
+                                        <v-layout row >
+                                        <v-flex xs3>
+                                            <table style="background-color:#402905;">
+                                                <tbody>
+                                                    <% for(var i=0;i<8;i++){ %>
+                                                    <tr>
+                                                    <% for(var j=0;j<5;j++){ %>
+                                                        <td>
+                                                        <% if(plantArr[i][j]){%>
+                                                        <button class="btn" id="btn<%=i%><%=j%>" onclick="removePlant('<%=plantArr[i][j]%>',img<%=i%><%=j%>.id)" style=" border:none;">
+                                                            <img class="btn-img" id="img<%=i%><%=j%>">
+                                                        </button>
+                                                        <%}%>
+                                                        <% if(!plantArr[i][j]){ %>
+                                                        <button class="btn" id="btn<%=i%><%=j%>" onclick="addPlant('<%=plantArr[i][j]%>',img<%=i%><%=j%>.id)" style=" border:none;">
+                                                        <img class="btn-img" id="img<%=i%><%=j%>" src="img/empty.png">
+                                                        </button>
+                                                        <% } %>
+                                                        </td>
+                                                    <% } %>
+                                                    </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </v-flex>
+                                        <v-flex xs6>
+                                            <h3 id="pName" class="font-weight-light">식물 이름</h2>
+                                            <h3 id="pCycle" class="font-weight-light">물 주기</h2>
+                                            <h3 id="pDate" class="font-weight-light">심은 날짜</h2>
+                                            <h3 id="pRDate" class="font-weight-light">최근 물준 시간</h2>
+                                        </v-flex>
+                                        </v-layout>
+                                    </v-card-text>
+                                </v-card>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-content>
+            </v-app>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+        <script>
+           new Vue({
+            el: '#app',
+            
+            })
+        </script>
+        <script>
+            settingPlant();
+            document.getElementById('curTime').innerHTML = "최근 갱신 시간: "+formatDate(new Date("<%=Measure.currentTime%>"));
+        </script>
+    </body>
 </html>

@@ -5,6 +5,7 @@ var router = express.Router();
 var Map = require('../models/map');
 var Plant = require('../models/plant');
 var Water = require('../models/water');
+var Measure = require('../models/measure');
 
 router.get('/', function(req, res){
     Map.find(function(err, map){
@@ -14,8 +15,12 @@ router.get('/', function(req, res){
         for(var i=0;i<map.length;i++){
             arr[map[i].y][map[i].x] = map[i].plantId;
         }
-        res.render('index', {
-            plantArr: arr
+        Measure.find(function(err, m){
+            if (err) return res.status(500).send({ error: 'database failure' });
+            res.render('index', {
+                plantArr: arr,
+                Measure: m[0]
+            });
         });
     })
 });

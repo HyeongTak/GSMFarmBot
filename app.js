@@ -17,7 +17,7 @@ app.use(session({
 app.use(express.static('public'));
 
 mongoose.connect('mongodb://admin1:admin1@ds229450.mlab.com:29450/farmbot',{ useNewUrlParser: true });
-mongoose.Promise = global.Promise; 
+mongoose.Promise = global.Promise;
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
