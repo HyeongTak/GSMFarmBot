@@ -4,13 +4,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
         <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
         <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+        <link href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" rel="stylesheet">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script>
             var plantSrc = "img/empty.png";
             var plantName = "show";
-
+    
             function formatLog(time1, time2){
                 var t2 = time2.getTime();
                 var t1 = time1.getTime();
@@ -35,7 +36,6 @@
                     document.getElementById("OTime<%=i%>").innerHTML = formatLog(new Date("<%=Log[Log.length-i-1].time%>"), new Date());
                 <%}%>
             }
-    
             function formatDate(date){
                 var y = date.getFullYear();
                 var m = date.getMonth();
@@ -54,22 +54,21 @@
               }else{
                 return t.toString()+'시간 '+ m.toString()+'분';
               }
-            }
-
+            }            
             function changePlant(p){
-                plantName = p;
-                if(p == "carrot"){
-                    plantSrc = "img/carrot.png";
-                }
-                if(p == "cabbage"){
-                    plantSrc = "img/cabbage.png";
-                }
-                if(p == "eraser"){
-                    plantSrc = "img/empty.png";
-                }
-                if(p == "show"){
-                    document.getElementById('plantBtn').style.display="none";
-                }
+            plantName = p;
+            if(p == "carrot"){
+                plantSrc = "img/carrot.png";
+            }
+            if(p == "cabbage"){
+                plantSrc = "img/cabbage.png";
+            }
+            if(p == "eraser"){
+                plantSrc = "img/empty.png";
+            }
+            if(p == "show"){
+                document.getElementById('plantBtn').style.display="none";
+            }
             }
             function showBtn(){
             document.getElementById('plantBtn').style.display="block";
@@ -113,7 +112,6 @@
                 $.post("/addLog",{
                     act : "물 주기 ("+imgId[4]+","+imgId[3]+")"
                 }).done();
-
             }else{
                 alert('심겨진 식물이 없습니다.');
             }
@@ -157,13 +155,13 @@
                 console.log('실행');
                 var img = document.getElementById(imgId);
                 if(img.src == "img/empty.png"){
-                  img.src = plantSrc;
-                  $.post("/addMap", { 
-                  plantName: plantName,
-                  x : imgId[4],
-                  y : imgId[3]
-                  }).done();
-                }
+                    img.src = plantSrc;
+                    $.post("/addMap", { 
+                    plantName: plantName,
+                    x : imgId[4],
+                    y : imgId[3]
+                    }).done();
+                  }
             }
             }
             function settingPlant(){
@@ -191,10 +189,24 @@
             }
         </script>
         <style>
+            @import url(//fonts.googleapis.com/earlyaccess/hanna.css);
+            @font-face{
+                font-family: 'Hanna', sans-serif; 
+            }
             img{
             width:50px;
             height:50px;
             background-color:transparent;
+            }
+            h1,h2,h3,h4 {
+                font-family: Hanna
+            }
+            #create .v-speed-dial {
+            position: absolute;
+            }
+
+            #create .v-btn--floating {
+            position: relative;
             }
             
         </style>
@@ -202,49 +214,93 @@
     <body>
         <div id="app">
             <v-app id="inspire">
-                <v-toolbar color="white" dark>
-                    <v-toolbar-title>Auto Farmer</v-toolbar-title>
+                <v-toolbar color="white">
+                    <v-toolbar-title dark>AutoFarmer</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-dialog v-model="dialog" width="500px">
+                        <v-btn icon slot="activator">
+                            <v-icon>info</v-icon>
+                        </v-btn>
+
+                        <v-card>
+                            <v-card-title class="headline grey lighten-2" primary-title>
+                            도움말 / 제작
+                            </v-card-title>
+
+                            <v-card-text>
+                                AutoFarmer 는 자동 농장 관리 기능으로 현재 웹페이지를 통해 기기의 정보, 활동 내역, 식물들을 관리할 수 있습니다.
+                                추가적인 기능은 제공 예정 입니다.
+                                <br>
+                                <br>
+                                HW: 김태현, 이후윤, 박승준, 이형석
+                                SW: 임찬우, 양경빈, 전형탁, 최화랑
+                            </v-card-text>
+
+                            <v-divider></v-divider>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="primary" flat @click="dialog = false">
+                                    창닫기
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-toolbar>
                 <v-content>
                     <v-container fluid grid-list-xl >
                         <v-layout align-center justify-center row>
-                           <v-flex xs4>
-                               <v-card light max-height="300px">
-                                   <v-card-title>
+                           <v-flex md4 lg4>
+                               <v-card light height="300px">
+                                   <v-card-title style="height:40px;">
                                       <div>
-                                          <h4 class="font-weight-medium">최근 기록</h2>
+                                          <h4 class="font-weight-bold">최근 기록</h2>
                                       </div> 
                                    </v-card-title>
                                    <v-divider light></v-divider>
                                    <v-card-text class="py-0">
+                                    <div style="overflow: auto; overflow-x: hidden;">
                                         <v-timeline style="height:240px;" dense align-top>
                                             <v-timeline-item
                                                 color="teal lighten-3"
-                                                small> 
-                                                <%for(var i=0;i<5;i++){%>
-                                                    <v-layout pt-3>
-                                                        <v-flex xs2>
-                                                            <strong id="OTime<%=i%>"></strong>
-                                                        </v-flex>
-                                                        <v-flex>
-                                                            <strong><%=Log[Log.length-i-1].act%></strong>
-                                                        </v-flex>
-                                                    </v-layout>
-                                                <%}%>
+                                                small style="height:50px"> 
+                                                <v-layout pt-3>
+                                                    <v-flex xs2>
+                                                        <strong id="OTime<%=0%>"></strong>
+                                                    </v-flex>
+                                                    <v-flex>
+                                                        <strong><%=Log[Log.length-1].act%></strong>
+                                                    </v-flex>
+                                                </v-layout>
                                             </v-timeline-item>
+                                            <%for(var i=1;i<5;i++){%>
+                                            <v-timeline-item
+                                                color="pink"
+                                                small style="height:50px"> 
+                                                <v-layout pt-3>
+                                                    <v-flex xs2>
+                                                        <strong id="OTime<%=i%>"></strong>
+                                                    </v-flex>
+                                                    <v-flex>
+                                                        <strong><%=Log[Log.length-i-1].act%></strong>
+                                                    </v-flex>
+                                                </v-layout>
+                                            </v-timeline-item>
+                                            <%}%>
+                                            
                                         </v-timeline>
+                                        </div
                                     </v-card-text>
                                </v-card>
                            </v-flex> 
-                           <v-flex xs5>
+                           <v-flex md5 lg5>
                                 <v-card light height="300px">
-                                    <v-card-title>
+                                    <v-card-title style="height:40px;">
                                        <div>
-                                           <h3 class="font-weight-medium">기기 정보</h2>
+                                           <h4 class="font-weight-bold">기기 정보</h2>
                                        </div> 
                                     </v-card-title>
-                                    <v-divider light>
-                                    </v-divider>
+                                    <v-divider light></v-divider>
                                     <v-card-text>
                                     <h2>습도 : <%=Measure.humidity%></h2>
                                     <h2>온도 : <%=Measure.temperature%></h2>
@@ -255,26 +311,26 @@
                             </v-flex> 
                         </v-layout>
                         <v-layout align-center justify-center row>
-                            <v-flex xs9>    
-                                <v-card light height="500px">
-                                    <v-card-title>
+                            <v-flex xs12 md9 lg9>    
+                                <v-card light height="510px">
+                                    <v-card-title style="height:40px;">
                                         <div>
-                                            <h3 class="font-weight-medium">식물 정보</h2>
+                                            <h4 class="font-weight-bold">식물 정보</h2>
                                         </div>
                                         <v-spacer></v-spacer>
                                         <div>
                                         </div>
                                     </v-card-title>
                                     <v-divider light></v-divider>
-                                    <v-card-text>
+                                    <v-card-text style="height:450px;">
                                         <v-layout row >
-                                        <v-flex xs3>
-                                            <table style="background-color:#402905;">
+                                        <v-flex xs4 md3 lg3>
+                                            <table style="background-color:transparent; border: 1.5px solid #ddd;">
                                                 <tbody>
                                                     <% for(var i=0;i<8;i++){ %>
                                                     <tr>
                                                     <% for(var j=0;j<5;j++){ %>
-                                                        <td>
+                                                        <td style="border-bottom:1px solid #ddd; border-right:1px solid #ddd">
                                                         <% if(plantArr[i][j]){%>
                                                         <button class="btn" id="btn<%=i%><%=j%>" onclick="removePlant('<%=plantArr[i][j]%>',img<%=i%><%=j%>.id)" style=" border:none;">
                                                             <img class="btn-img" id="img<%=i%><%=j%>">
@@ -292,13 +348,62 @@
                                                 </tbody>
                                             </table>
                                         </v-flex>
-                                        <v-flex xs6>
-                                            <h3 id="pName" class="font-weight-light">식물 이름</h2>
-                                            <h3 id="pCycle" class="font-weight-light">물 주기</h2>
-                                            <h3 id="pDate" class="font-weight-light">심은 날짜</h2>
-                                            <h3 id="pRDate" class="font-weight-light">최근 물준 시간</h2>
+                                        <v-layout column>
+                                        <v-flex xs6 md6 lg6>
+                                                <h2 id="pName" class="font-weight-bold">식물 이름</h2>
+                                                <h2 id="pCycle">물 주기</h2>
+                                                <h2 id="pDate">심은 날짜</h2>
+                                                <h2 id="pRDate">최근 물준 시간</h2>
+                                        </v-flex>
+                                        <v-flex xs6 md6 lg6>
+                                            <v-speed-dial
+                                                style="width:65px;"
+                                                v-model="fab"
+                                                :top="top"
+                                                :bottom="bottom"
+                                                :right="right"
+                                                :left="left"
+                                                :direction="direction"
+                                                :open-on-hover="hover"
+                                                :transition="transition"
+                                                >
+                                                <v-btn
+                                                    slot="activator"
+                                                    v-model="fab"
+                                                    color="blue darken-2"
+                                                    dark
+                                                    fab
+                                                >
+                                                    <v-icon>account_circle</v-icon>
+                                                    <v-icon>close</v-icon>
+                                                </v-btn>
+
+                                                <v-btn
+                                                    fab
+                                                    dark
+                                                    small
+                                                    color="indigo"
+                                                >
+                                                    <v-icon>fas fa-leaf</v-icon>
+                                                </v-btn>
+                                                <v-btn
+                                                    fab
+                                                    dark
+                                                    small
+                                                    color="red"
+                                                >
+                                                    <v-icon>delete</v-icon>
+                                                </v-btn>
+                                                </v-speed-dial>
                                         </v-flex>
                                         </v-layout>
+                                        <v-flex xs3 md3 lg3>
+                                        <div style="border:1px solid #ddd; height:430px;">
+                                            <b>기능 준비중</b>
+                                        </div>
+                                        </v-flex>
+                                        </v-layout>
+                   
                                     </v-card-text>
                                 </v-card>
                             </v-flex>
@@ -313,9 +418,47 @@
         <script>
            new Vue({
             el: '#app',
-            
-            })
-        </script>
+            data: () => ({
+                    dialog: false,
+                    direction: 'right',
+                    fab: false,
+                    fling: false,
+                    hover: false,
+                    tabs: null,
+                    top: false,
+                    right: true,
+                    bottom: true,
+                    left: false,
+                    transition: 'slide-y-reverse-transition'
+                    
+                }),           
+                    computed: {
+                        activeFab () {
+                        switch (this.tabs) {
+                            case 'one': return { 'class': 'purple', icon: 'account_circle' }
+                            case 'two': return { 'class': 'red', icon: 'edit' }
+                            case 'three': return { 'class': 'green', icon: 'keyboard_arrow_up' }
+                            default: return {}
+                        }
+                        }
+                    },
+
+                    watch: {
+                        top (val) {
+                        this.bottom = !val
+                        },
+                        right (val) {
+                        this.left = !val
+                        },
+                        bottom (val) {
+                        this.top = !val
+                        },
+                        left (val) {
+                        this.right = !val
+                        }
+                    }
+                 })
+             </script>
         <script>
             setOTime();
             settingPlant();
