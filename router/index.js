@@ -6,6 +6,7 @@ var Map = require('../models/map');
 var Plant = require('../models/plant');
 var Water = require('../models/water');
 var Measure = require('../models/measure');
+var Log = require('../models/log');
 
 router.get('/', function(req, res){
     Map.find(function(err, map){
@@ -17,9 +18,12 @@ router.get('/', function(req, res){
         }
         Measure.find(function(err, m){
             if (err) return res.status(500).send({ error: 'database failure' });
-            res.render('index', {
-                plantArr: arr,
-                Measure: m[0]
+            Log.find(function(err, log){
+                res.render('index', {
+                    plantArr: arr,
+                    Measure: m[0],
+                    Log: log
+                });
             });
         });
     })
@@ -40,6 +44,18 @@ router.post('/addMap', function(req,res){
         });
     });
 });
+
+router.post('/addLog', function(req, res){
+    var log = new Log();
+    log.act = req.body.act;
+    log.save(function (err) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        res.send('성공');
+    });
+})
 
 router.post('/water', function(req, res){
     console.log('물');

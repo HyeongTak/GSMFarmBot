@@ -10,6 +10,31 @@
         <script>
             var plantSrc = "img/empty.png";
             var plantName = "show";
+
+            function formatLog(time1, time2){
+                var t2 = time2.getTime();
+                var t1 = time1.getTime();
+                var time = parseInt((t2-t1)/1000);
+                if(time < 60){
+                    return '방금';
+                }
+                time = parseInt(time/60)
+                if(time < 60){
+                    return '약 '+time.toString()+'분전';
+                }
+                time = parseInt(time/60)
+                if(time < 24){
+                    return '약 '+time.toString()+'시간전';
+                }
+                time = parseInt(time/24)
+                return '약 '+time.toString()+'일전';
+            }
+
+            function setOTime(){
+                <%for(var i=0;i<5;i++){%>
+                    document.getElementById("OTime<%=i%>").innerHTML = formatLog(new Date("<%=Log[Log.length-1].time%>"), new Date());
+                <%}%>
+            }
     
             function formatDate(date){
                 var y = date.getFullYear();
@@ -32,19 +57,19 @@
             }
 
             function changePlant(p){
-            plantName = p;
-            if(p == "carrot"){
-                plantSrc = "img/carrot.png";
-            }
-            if(p == "cabbage"){
-                plantSrc = "img/cabbage.png";
-            }
-            if(p == "eraser"){
-                plantSrc = "img/empty.png";
-            }
-            if(p == "show"){
-                document.getElementById('plantBtn').style.display="none";
-            }
+                plantName = p;
+                if(p == "carrot"){
+                    plantSrc = "img/carrot.png";
+                }
+                if(p == "cabbage"){
+                    plantSrc = "img/cabbage.png";
+                }
+                if(p == "eraser"){
+                    plantSrc = "img/empty.png";
+                }
+                if(p == "show"){
+                    document.getElementById('plantBtn').style.display="none";
+                }
             }
             function showBtn(){
             document.getElementById('plantBtn').style.display="block";
@@ -83,6 +108,10 @@
                 $.post("/updateMap", {
                 x : imgId[4],
                 y : imgId[3]
+                }).done();
+
+                $.post("/addLog",{
+                    act : "물 주기 ("+imgId[4]+","+imgId[3]+")"
                 }).done();
 
             }else{
@@ -192,14 +221,16 @@
                                             <v-timeline-item
                                                 color="teal lighten-3"
                                                 small> 
-                                                <v-layout pt-3>
-                                                    <v-flex xs2>
-                                                        <strong>방금</strong>
-                                                    </v-flex>
-                                                    <v-flex>
-                                                        <strong>물 주기(3,5)</strong>
-                                                    </v-flex>
-                                                </v-layout>
+                                                <%for(var i=0;i<5;i++){%>
+                                                    <v-layout pt-3>
+                                                        <v-flex xs2>
+                                                            <strong id="OTime<%=i%>"></strong>
+                                                        </v-flex>
+                                                        <v-flex>
+                                                            <strong><%=Log[Log.length-i-1].act%></strong>
+                                                        </v-flex>
+                                                    </v-layout>
+                                                <%}%>
                                             </v-timeline-item>
                                         </v-timeline>
                                     </v-card-text>
@@ -286,6 +317,7 @@
             })
         </script>
         <script>
+            setOTime();
             settingPlant();
             document.getElementById('curTime').innerHTML = "최근 갱신 시간: "+formatDate(new Date("<%=Measure.currentTime%>"));
         </script>
