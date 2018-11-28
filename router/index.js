@@ -41,6 +41,7 @@ router.post('/addMap', function(req,res){
                 console.error(err);
                 return;
             }
+            console.log('map저장');
         });
     });
 });
@@ -105,7 +106,7 @@ router.post('/setting', function(req, res){
     });
 
     var plant2 = new Plant();
-    plant2.name = "cabbage";
+    plant2.name = "tomato";
     plant2.cycle = 12*60;
 
     plant2.save(function (err) {

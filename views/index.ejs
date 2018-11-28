@@ -16,8 +16,11 @@
                 var t2 = time2.getTime();
                 var t1 = time1.getTime();
                 var time = parseInt((t2-t1)/1000);
-                if(time < 60){
+                if(time < 5){
                     return '방금';
+                }
+                if(time < 60){
+                    return '약 '+time.toString()+'초전'
                 }
                 time = parseInt(time/60)
                 if(time < 60){
@@ -57,18 +60,18 @@
             }            
             function changePlant(p){
             plantName = p;
-            if(p == "carrot"){
-                plantSrc = "img/carrot.png";
-            }
-            if(p == "cabbage"){
-                plantSrc = "img/cabbage.png";
-            }
-            if(p == "eraser"){
-                plantSrc = "img/empty.png";
-            }
-            if(p == "show"){
-                document.getElementById('plantBtn').style.display="none";
-            }
+                if(p == "carrot"){
+                    plantSrc = "img/carrot.png";
+                }
+                if(p == "tomato"){
+                    plantSrc = "img/tomato.png";
+                }
+                if(p == "eraser"){
+                    plantSrc = "img/empty.png";
+                }
+                if(p == "show"){
+                    document.getElementById('plantBtn').style.display="none";
+                }
             }
             function showBtn(){
             document.getElementById('plantBtn').style.display="block";
@@ -83,8 +86,8 @@
                 if(result == "carrot"){
                 plantSrc = "img/carrot.png";
                 }
-                if(result == "cabbage"){
-                plantSrc = "img/cabbage.png";
+                if(result == "tomato"){
+                plantSrc = "img/tomato.png";
                 }
                 var img = document.getElementById(imgId);
                 img.src = plantSrc;
@@ -110,7 +113,7 @@
                 }).done();
 
                 $.post("/addLog",{
-                    act : "물 주기 ("+imgId[4]+","+imgId[3]+")"
+                    act : "물 주기 ["+imgId[4]+","+imgId[3]+"]"
                 }).done();
             }else{
                 alert('심겨진 식물이 없습니다.');
@@ -147,22 +150,23 @@
             }
             
             function addPlant(plantId, imgId){
-            if(plantName == "show"){
-                showInfo(plantId, imgId);
-            }else if(plantName == "water"){
-                watering(plantId, imgId);
-            }else if(!(plantName == "eraser")){
-                console.log('실행');
-                var img = document.getElementById(imgId);
-                if(img.src == "img/empty.png"){
-                    img.src = plantSrc;
-                    $.post("/addMap", { 
-                    plantName: plantName,
-                    x : imgId[4],
-                    y : imgId[3]
-                    }).done();
-                  }
-            }
+                if(plantName == "show"){
+                    showInfo(plantId, imgId);
+                }else if(plantName == "water"){
+                    watering(plantId, imgId);
+                }else if(!(plantName == "eraser")){
+                    var img = document.getElementById(imgId);
+                        img.src = plantSrc;
+                        $.post("/addMap", { 
+                        plantName: plantName,
+                        x : imgId[4],
+                        y : imgId[3]
+                        }).done();
+                        $.post("/addLog",{
+                        act : "씨앗 심기"+"("+plantName+")"+" ["+imgId[4]+","+imgId[3]+"]"
+                        }).done();
+                        
+                }
             }
             function settingPlant(){
             <% for(var i=0;i<8;i++){%>
@@ -182,6 +186,9 @@
                     x : imgId[4],
                     y : imgId[3]
                 }).done();
+                $.post("/addLog",{
+                        act : "식물 제거"+" ["+imgId[4]+","+imgId[3]+"]"
+                        }).done();
                 var img = document.getElementById(imgId);
                 img.src = plantSrc;
                 }
@@ -189,9 +196,9 @@
             }
         </script>
         <style>
-            @import url(//fonts.googleapis.com/earlyaccess/hanna.css);
+            @import url(http://fonts.googleapis.com/earlyaccess/hanna.css);
             @font-face{
-                font-family: 'Hanna', sans-serif; 
+                font-family: 'Hanna'; 
             }
             img{
             width:50px;
@@ -209,6 +216,159 @@
             position: relative;
             }
             
+            $color-paid: #7fdbff;
+            $color-sent: #39cccc;
+
+            #q-graph {
+                /* fixes layout wonkiness in FF1.5 */
+                position: relative;
+                top:1%;
+                width: 600px;
+                height: 300px;
+                margin: 1.1em 0 0;
+                padding: 0;
+                background: transparent;
+                font-size: 11px;
+            }
+            
+            #q-graph caption {
+                caption-side: top;
+                width: 600px;
+                text-transform: uppercase;
+                letter-spacing: .5px;
+                top: -40px;
+                position: relative;
+                z-index: 10;
+                font-weight: bold;
+            }
+            
+            #q-graph tr, #q-graph th, #q-graph td {
+                position: absolute;
+                bottom: 0;
+                width: 150px;
+                z-index: 2;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            
+            #q-graph td {
+                transition: all .3s ease;
+            }
+            #q-graph td:hover {
+                background-color: #4d4d4d;
+                opacity: .9;
+                color: white;
+            }
+            
+            #q-graph thead tr {
+                left: 50%;
+                top: 40%;
+                bottom: auto;
+                margin: -2.5em 0 0 5em;
+            }
+            
+            #q-graph thead th {
+                width: 4.8em;
+                height: auto;
+                padding: 0.5em 1em;
+            }
+            
+            #q-graph thead th.sent {
+                top: 0;
+                left: 0;
+                line-height: 2;
+            }
+            
+            #q-graph thead th.paid {
+                top: 2.75em;
+                line-height: 2;
+                left: 0;
+            }
+            #q-graph thead th.recent{
+                top: 10em;
+                left:0;
+            }
+            
+            #q-graph tbody tr {
+                height: 200px;
+                padding-top: 2px;
+                color: #AAA;
+            }
+            
+            #q-graph #q1 {
+                left: 0;
+            }
+            
+            #q-graph #q2 {
+                left: 150px;
+            }
+            
+            #q-graph #q3 {
+                left: 300px;
+            }
+            
+            #q-graph #q4 {
+                left: 450px;
+                border-right: none;
+            }
+            
+            #q-graph tbody th {
+                top: -2.5em;
+                vertical-align: top;
+                font-weight: normal;
+                color: #333;
+            }
+            
+            #q-graph .bar {
+                width: 60px;
+                border: 1px solid;
+                border-bottom: none;
+                color: #000;
+            }
+            
+            #q-graph .bar p {
+                margin: 5px 0 0;
+                padding: 0;
+                opacity: .4;
+            }
+            
+            #q-graph .sent {
+                left: 13px;
+                background-color: #39cccc;
+                border-color: transparent;
+            }
+            
+            #q-graph .paid {
+                left: 77px;
+                background-color: #7fdbff;
+                border-color: transparent;
+            }
+            
+            #ticks {
+                position: relative;
+                top: -300px;
+                left: 2px;
+                width: 596px;
+                height: 300px;
+                z-index: 1;
+                margin-bottom: -300px;
+                font-size: 10px;
+                font-family: "fira-sans-2", Verdana, sans-serif;
+            }
+            
+            #ticks .tick {
+                position: relative;
+                border-bottom: 1px dotted #C4C4C4;
+                width: 600px;
+            }
+            
+            #ticks .tick p {
+                position: absolute;
+                left: -5em;
+                top: -0.8em;
+                margin: 0 0 0 0.5em;
+            }
         </style>
     </head>
     <body>
@@ -232,7 +392,7 @@
                                 추가적인 기능은 제공 예정 입니다.
                                 <br>
                                 <br>
-                                HW: 김태현, 이후윤, 박승준, 이형석
+                                HW: 김태현, 이후윤, 박승준, 이형석<br>
                                 SW: 임찬우, 양경빈, 전형탁, 최화랑
                             </v-card-text>
 
@@ -265,7 +425,7 @@
                                                 color="teal lighten-3"
                                                 small style="height:50px"> 
                                                 <v-layout pt-3>
-                                                    <v-flex xs2>
+                                                    <v-flex xs3>
                                                         <strong id="OTime<%=0%>"></strong>
                                                     </v-flex>
                                                     <v-flex>
@@ -278,7 +438,7 @@
                                                 color="pink"
                                                 small style="height:50px"> 
                                                 <v-layout pt-3>
-                                                    <v-flex xs2>
+                                                    <v-flex xs3>
                                                         <strong id="OTime<%=i%>"></strong>
                                                     </v-flex>
                                                     <v-flex>
@@ -293,7 +453,7 @@
                                     </v-card-text>
                                </v-card>
                            </v-flex> 
-                           <v-flex md5 lg5>
+                           <v-flex md3 lg3>
                                 <v-card light height="300px">
                                     <v-card-title style="height:40px;">
                                        <div>
@@ -302,16 +462,34 @@
                                     </v-card-title>
                                     <v-divider light></v-divider>
                                     <v-card-text>
-                                    <h2>습도 : <%=Measure.humidity%></h2>
-                                    <h2>온도 : <%=Measure.temperature%></h2>
-                                    <br><br><br><br><br><br>
-                                    <h4 id="curTime" style="text-align:right;"></h2>
+                                    <table id="q-graph">
+                                    <thead>
+                                    <th class="sent">온도</th>
+                                    <th class="paid">습도</th>
+                                    <h4 id="curTime" class="recent"></h4>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="qtr" id="q1">
+                                    <td class="sent bar" style="height: 111px;"><p><%=Measure.temperature%>C</p></td>
+                                    <td class="paid bar" style="height: 99px;"><p><%=Measure.humidity%>%</p></td>
+                                    </tr>
+                                    <!--<tr class="qtr" id="q2">
+                                    <th scope="row">오늘 평균</th>
+                                    <td class="sent bar" style="height: 206px;"><p>25C</p></td>
+                                    <td class="paid bar" style="height: 194px;"><p>40%</p></td>
+                                    </tr>-->
+                                    
+                                    <div>
+                                    </tbody>
+                                    
+                                    </table>
+                                    
                                     </v-card-text>
                                 </v-card>
                             </v-flex> 
                         </v-layout>
-                        <v-layout align-center justify-center row>
-                            <v-flex xs12 md9 lg9>    
+                        <v-layout align-center justify-center row >
+                            <v-flex xs12 md5 lg5>    
                                 <v-card light height="510px">
                                     <v-card-title style="height:40px;">
                                         <div>
@@ -324,7 +502,7 @@
                                     <v-divider light></v-divider>
                                     <v-card-text style="height:450px;">
                                         <v-layout row >
-                                        <v-flex xs4 md3 lg3>
+                                        <v-flex xs4 md6 lg6>
                                             <table style="background-color:transparent; border: 1.5px solid #ddd;">
                                                 <tbody>
                                                     <% for(var i=0;i<8;i++){ %>
@@ -351,59 +529,107 @@
                                         <v-layout column>
                                         <v-flex xs6 md6 lg6>
                                                 <h2 id="pName" class="font-weight-bold">식물 이름</h2>
-                                                <h2 id="pCycle">물 주기</h2>
+                                                <h2 id="pCycle">물 주는 주기</h2>
                                                 <h2 id="pDate">심은 날짜</h2>
                                                 <h2 id="pRDate">최근 물준 시간</h2>
                                         </v-flex>
                                         <v-flex xs6 md6 lg6>
-                                            <v-speed-dial
-                                                style="width:65px;"
-                                                v-model="fab"
-                                                :top="top"
-                                                :bottom="bottom"
-                                                :right="right"
-                                                :left="left"
-                                                :direction="direction"
-                                                :open-on-hover="hover"
-                                                :transition="transition"
-                                                >
+                                            <div style="margin-top:100px">
                                                 <v-btn
-                                                    slot="activator"
-                                                    v-model="fab"
-                                                    color="blue darken-2"
-                                                    dark
-                                                    fab
-                                                >
-                                                    <v-icon>account_circle</v-icon>
-                                                    <v-icon>close</v-icon>
-                                                </v-btn>
-
-                                                <v-btn
+                                                    class="btn"
+                                                    onclick="changePlant('carrot')"
                                                     fab
                                                     dark
                                                     small
-                                                    color="indigo"
+                                                    color="orange"
                                                 >
                                                     <v-icon>fas fa-leaf</v-icon>
                                                 </v-btn>
                                                 <v-btn
+                                                    class="btn"
+                                                    onclick="changePlant('tomato')"
                                                     fab
                                                     dark
                                                     small
                                                     color="red"
                                                 >
+                                                    <v-icon>fas fa-leaf</v-icon>
+                                                </v-btn>
+                                                <v-btn
+                                                    class="btn"
+                                                    onclick="changePlant('water')"
+                                                    fab
+                                                    dark
+                                                    small
+                                                    color="blue"
+                                                >
+                                                    <v-icon>fas fa-tint</v-icon>
+                                                </v-btn>
+                                                <v-btn
+                                                    class="btn"
+                                                    onclick="changePlant('show')"
+                                                    fab
+                                                    dark
+                                                    small
+                                                    color="pink"
+                                                >
+                                                    <v-icon>fas fa-search</v-icon>
+                                                </v-btn>
+                                                <v-btn
+                                                    class="btn"
+                                                    onclick="changePlant('eraser')"
+                                                    fab
+                                                    dark
+                                                    small
+                                                    color="grey"
+                                                >
                                                     <v-icon>delete</v-icon>
                                                 </v-btn>
-                                                </v-speed-dial>
-                                        </v-flex>
+                                                <v-btn 
+                                                    style="margin-left:320px"
+                                                    class="btn"
+                                                    onclick="window.location.replace('/');"
+                                                    fab
+                                                    dark
+                                                    small
+                                                    color="green">
+                                                    <v-icon>fas fa-check</v-icon>
+                                                </v-btn>
+                                                </div>
+                                            </v-flex>
                                         </v-layout>
-                                        <v-flex xs3 md3 lg3>
-                                        <div style="border:1px solid #ddd; height:430px;">
-                                            <b>기능 준비중</b>
-                                        </div>
-                                        </v-flex>
                                         </v-layout>
-                   
+                                    </v-card-text>
+                                </v-card>
+                            </v-flex>
+                                 <v-flex xs12 md2 lg2>    
+                                <v-card light height="510px">
+                                    <v-card-title style="height:40px">
+                                        <h4 class="font-weight-bold">이동</h4>
+                                    </v-card-title>
+                                    <v-divider></v-divider>
+                                    <v-card-text>
+                                        <v-layout column>
+                                            <v-flex xs12 lg8>
+                                            
+                                            </v-flex>
+                                            <v-flex xs12 lg3>
+                                                <v-btn icon color="blue" dark>
+                                                    <v-icon>fas fa-chevron-left</v-icon>
+                                                </v-btn>
+                                                <v-btn icon color="blue" dark>
+                                                    <v-icon>fas fa-chevron-right</v-icon>
+                                                </v-btn>
+                                                <v-btn icon color="blue" dark>
+                                                    <v-icon>fas fa-chevron-up</v-icon>
+                                                </v-btn>
+                                                <v-btn icon color="blue" dark>
+                                                    <v-icon>fas fa-chevron-down</v-icon>
+                                                </v-btn>
+
+                                            </v-flex>
+                                            
+                                        </v-layout>
                                     </v-card-text>
                                 </v-card>
                             </v-flex>
@@ -412,7 +638,7 @@
                 </v-content>
             </v-app>
         </div>
-
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
         <script>
