@@ -13,10 +13,10 @@
 * Vuetify
 
 ### 백엔드
-* express
+* node.js(express)
 
 ### 데이터베이스
-* node.js(mongodb)
+* mongodb
 
 ## 피드백
 
