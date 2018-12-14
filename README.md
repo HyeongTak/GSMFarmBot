@@ -1,5 +1,6 @@
 # GSMFarmBot
 농사 로봇에 연동시키는 웹
+[DEMO](https://gsm-farm-bot.herokuapp.com/)
 
 ## 기능
 * **최근 기록**: 최근 기록 db에 요청하여 최근 5개의 기록을 출력
