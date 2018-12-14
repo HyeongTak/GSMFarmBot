@@ -17,8 +17,14 @@
     "url": "https://github.com/HyeongTak/gsm_farm_bot/issues"
   },
   "homepage": "https://github.com/HyeongTak/gsm_farm_bot#readme",
-  "engines":{
-    "node": "10.13.0",
+  "engines": {
+    "node": "v10.13.0",
     "npm": "6.4.1"
+  },
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "mongoose": "^5.3.16"
   }
 }
