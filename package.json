@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/HyeongTak/gsm_farm_bot/issues"
   },
-  "homepage": "https://github.com/HyeongTak/gsm_farm_bot#readme"
+  "homepage": "https://github.com/HyeongTak/gsm_farm_bot#readme",
+  "engines":{
+    "node": "10.13.0",
+    "npm": "6.4.1"
+  }
 }
